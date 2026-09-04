@@ -1489,6 +1489,16 @@ function initTheme() {
   applyTheme(prefersDark ? "dark" : "light");
 }
 
+function applyTheme(theme) {
+  const dark = theme === "dark";
+  document.body.classList.toggle("dark-theme", dark);
+  localStorage.setItem(THEME_KEY, dark ? "dark" : "light");
+
+  themeToggleIconEl.textContent = dark ? "light_mode" : "dark_mode";
+  themeToggleBtnEl.setAttribute("aria-label", dark ? "Ativar modo claro" : "Ativar modo escuro");
+  themeToggleBtnEl.title = dark ? "Ativar modo claro" : "Ativar modo escuro";
+}
+
 function getNoteCountByDay(year, month) {
   const map = new Map();
 

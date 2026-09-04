@@ -609,14 +609,20 @@ function renderList() {
       const lockedClass = note.locked ? "is-locked" : "";
       const priorityTag = getPriorityChip(note.priority || 0);
       const lockTag = note.locked ? '<span class="lock-chip">PIN</span>' : "";
-      const noteTitle = note.title && note.title !== "Nova nota" ? note.title : "";
-      const title = escapeHtml(noteTitle || generateNoteTitle(note.content) || "Sem titulo");
+      const contentText = (note.content || "").replace(/\s+/g, " ").trim();
+      const contentWords = contentText ? contentText.split(" ") : [];
+      const titleText =
+        contentWords.length > 0
+          ? contentWords.slice(0, 2).join(" ")
+          : note.title && note.title !== "Nova nota"
+            ? note.title
+            : "Sem titulo";
+      const restText = contentWords.slice(2).join(" ");
+      const title = escapeHtml(titleText);
       const preview = note.locked
         ? "Conteudo bloqueado"
-        : escapeHtml((note.content || "").slice(0, 74));
+        : escapeHtml(restText.slice(0, 74));
       const date = formatDate(note.updatedAt);
-      const imageCount = Array.isArray(note.images) ? note.images.length : 0;
-      const imageMeta = imageCount > 0 ? `${imageCount} imagem(ns)` : "";
       const delay = Math.min(index * 25, 200);
 
       return `
@@ -629,8 +635,7 @@ function renderList() {
             </div>
           </div>
           <div class="note-meta">${date}</div>
-          <div class="note-meta">${preview || "Sem conteudo"}</div>
-          <div class="note-meta">${imageMeta}</div>
+          ${preview ? `<div class="note-meta note-preview">${preview}</div>` : ""}
         </button>
       `;
     })

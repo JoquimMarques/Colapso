@@ -28,6 +28,12 @@ body {
   background: #000000;
   padding: 14px 12px calc(108px + env(safe-area-inset-bottom));
   overflow-x: hidden;
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
 }
 
 body.app-locked {
@@ -185,10 +191,10 @@ body.dark-theme {
 .bg-glow {
   position: fixed;
   border-radius: 999px;
-  filter: blur(20px);
+  filter: blur(26px);
   pointer-events: none;
   z-index: -1;
-  display: none;
+  opacity: 0.55;
 }
 
 .bg-glow-a {
@@ -196,7 +202,7 @@ body.dark-theme {
   height: 250px;
   top: -90px;
   right: -84px;
-  background: rgba(30, 169, 95, 0.17);
+  background: rgba(30, 169, 95, 0.18);
 }
 
 .bg-glow-b {
@@ -204,7 +210,7 @@ body.dark-theme {
   height: 260px;
   bottom: -120px;
   left: -96px;
-  background: rgba(103, 208, 143, 0.18);
+  background: rgba(41, 189, 111, 0.16);
 }
 
 .app-shell {
@@ -301,6 +307,12 @@ textarea::placeholder {
   color: #6b6b70;
 }
 
+.search-wrap input:focus {
+  outline: none;
+  border-color: #1ea95f;
+  box-shadow: 0 0 0 3px rgba(30, 169, 95, 0.18);
+}
+
 .content-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -353,13 +365,14 @@ textarea::placeholder {
 
 .note-item:hover,
 .note-item:focus-visible {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(30, 169, 95, 0.06);
   transform: none;
   outline: none;
 }
 
 .note-item.active {
-  box-shadow: inset 3px 0 0 var(--brand);
+  box-shadow: inset 3px 0 0 #1ea95f;
+  background: rgba(30, 169, 95, 0.08);
 }
 
 .note-item.is-locked h3,
@@ -523,10 +536,14 @@ textarea {
 
 .content-editor .inline-editor-image {
   display: block;
-  max-width: 100%;
-  border-radius: 12px;
+  width: 100%;
+  height: auto;
+  max-height: 55vh;
+  object-fit: contain;
+  border-radius: 14px;
   margin: 8px 0;
   border: 1px solid var(--line);
+  background: #0d0d0d;
 }
 
 .content-editor .editor-code-block {
@@ -546,7 +563,7 @@ textarea {
 
 .image-gallery {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 10px;
 }
 
@@ -556,26 +573,30 @@ textarea {
   border-radius: 14px;
   overflow: hidden;
   background: #0d0d0d;
+  aspect-ratio: 1 / 1;
 }
 
 .image-card img {
   display: block;
   width: 100%;
-  height: 120px;
+  height: 100%;
   object-fit: cover;
 }
 
 .image-remove {
   position: absolute;
-  right: 7px;
-  top: 7px;
-  width: 28px;
-  height: 28px;
+  right: 8px;
+  top: 8px;
+  width: 32px;
+  height: 32px;
   border: 1px solid #3a3a3a;
   border-radius: 999px;
-  background: rgba(20, 20, 20, 0.9);
+  background: rgba(20, 20, 20, 0.92);
   color: #d4d4d8;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .image-empty {
@@ -623,12 +644,12 @@ textarea {
   max-width: 300px;
   margin: 0 auto;
   padding: 8px 10px;
-  border: 1px solid var(--line);
+  border: 1px solid rgba(30, 169, 95, 0.4);
   border-radius: 999px;
-  background: rgba(20, 20, 20, 0.9);
+  background: rgba(18, 18, 18, 0.92);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 0 6px rgba(30, 169, 95, 0.07), 0 0 24px rgba(30, 169, 95, 0.12);
 }
 
 #addNav.app-nav {
@@ -700,8 +721,9 @@ textarea {
 }
 
 .nav-btn.is-active {
-  background: #262626;
-  color: #ffffff;
+  background: #14352a;
+  color: #5fe39a;
+  box-shadow: 0 0 14px rgba(30, 169, 95, 0.25);
 }
 
 .nav-btn-success {
@@ -994,8 +1016,9 @@ textarea {
 }
 
 .day-cell.has-notes {
-  border-color: #2c2c2c;
-  background: #121212;
+  border-color: rgba(30, 169, 95, 0.55);
+  background: rgba(30, 169, 95, 0.12);
+  box-shadow: 0 0 10px rgba(30, 169, 95, 0.14);
 }
 
 .day-number {

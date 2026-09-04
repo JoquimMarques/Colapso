@@ -48,7 +48,6 @@ const contentInputEl = document.getElementById("contentInput");
 const searchInputEl = document.getElementById("searchInput");
 const statusTextEl = document.getElementById("statusText");
 
-const viewNotesBtnEl = document.getElementById("viewNotesBtn");
 const viewAddBtnEl = document.getElementById("viewAddBtn");
 const viewCalendarBtnEl = document.getElementById("viewCalendarBtn");
 
@@ -94,6 +93,8 @@ let speechRecognizer = null;
 const speechLanguageCandidates = buildSpeechLanguageCandidates();
 let speechLanguageIndex = 0;
 let speechRetryCount = 0;
+let speechInterimText = "";
+let speechShouldInsertInterim = false;
 
 let notes = [];
 let selectedId = null;
@@ -301,10 +302,6 @@ function bindEvents() {
     closeAccountModal();
   });
 
-  viewNotesBtnEl.addEventListener("click", () => {
-    setView("home");
-  });
-
   viewAddBtnEl.addEventListener("click", () => {
     const created = makeNote();
     notes.unshift(created);
@@ -315,7 +312,7 @@ function bindEvents() {
   });
 
   viewCalendarBtnEl.addEventListener("click", () => {
-    setView("calendar");
+    setView(currentView === "calendar" ? "home" : "calendar");
   });
 
   editorBackBtnEl.addEventListener("click", () => {
@@ -333,6 +330,8 @@ function bindEvents() {
       stopDictation();
       statusTextEl.textContent = "Ditado interrompido";
     } else {
+      speechRetryCount = 0;
+      speechLanguageIndex = 0;
       startDictation();
     }
   });
@@ -568,7 +567,6 @@ function setView(view) {
   mainNavEl.classList.toggle("hidden", showAdd);
   addNavEl.classList.toggle("hidden", !showAdd);
 
-  viewNotesBtnEl.classList.toggle("is-active", showHome);
   viewAddBtnEl.classList.toggle("is-active", showAdd);
   viewCalendarBtnEl.classList.toggle("is-active", showCalendar);
 
@@ -813,22 +811,37 @@ function setupDictation() {
   speechRecognizer = new SpeechRecognitionApi();
   speechRecognizer.lang = speechLanguageCandidates[speechLanguageIndex] || "pt-PT";
   speechRecognizer.interimResults = true;
+  speechRecognizer.maxAlternatives = 1;
   speechRecognizer.continuous = false;
+
+  speechRecognizer.onstart = () => {
+    isRecording = true;
+    toolbarVoiceBtnEl.classList.add("is-recording");
+  };
 
   speechRecognizer.onresult = (event) => {
     let transcript = "";
+    let interim = "";
 
     for (let i = event.resultIndex; i < event.results.length; i += 1) {
       const part = event.results[i][0]?.transcript ?? "";
       if (event.results[i].isFinal) {
         transcript += part;
+      } else {
+        interim += part;
       }
     }
 
+    speechInterimText = interim.trim();
     const finalText = transcript.trim();
-    if (!finalText) return;
+    if (!finalText) {
+      speechShouldInsertInterim = Boolean(speechInterimText);
+      return;
+    }
 
     speechRetryCount = 0;
+    speechShouldInsertInterim = false;
+    speechInterimText = "";
     insertTextAtCursor(`${finalText} `);
     saveDraftFromInputs();
   };
@@ -852,6 +865,15 @@ function setupDictation() {
   speechRecognizer.onend = () => {
     isRecording = false;
     toolbarVoiceBtnEl.classList.remove("is-recording");
+
+    if (speechShouldInsertInterim && speechInterimText) {
+      const pendingText = speechInterimText;
+      speechShouldInsertInterim = false;
+      speechInterimText = "";
+      insertTextAtCursor(`${pendingText} `);
+      saveDraftFromInputs();
+    }
+    speechInterimText = "";
   };
 }
 
@@ -879,8 +901,6 @@ function startDictation() {
 
   try {
     isRecording = true;
-    speechRetryCount = 0;
-    speechLanguageIndex = 0;
     toolbarVoiceBtnEl.classList.add("is-recording");
     const currentLang = speechLanguageCandidates[speechLanguageIndex] || "pt-PT";
     statusTextEl.textContent = `A ouvir... (${currentLang})`;
@@ -1189,10 +1209,49 @@ function getPriorityChip(priority) {
 function readImageAsDataUrl(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result || ""));
+    reader.onload = () => resolve(normalizeImageDataUrl(file, String(reader.result || "")));
     reader.onerror = () => reject(new Error("Falha ao ler imagem"));
     reader.readAsDataURL(file);
   });
+}
+
+function normalizeImageDataUrl(file, dataUrl) {
+  const type = String(file.type || "").toLowerCase();
+
+  if (type === "image/gif" || type === "image/svg+xml" || !dataUrl.startsWith("data:image/")) {
+    return dataUrl;
+  }
+
+  try {
+    const img = new Image();
+    img.src = dataUrl;
+
+    const MAX_SIDE = 1280;
+    let { width, height } = img;
+    if (width <= 0 || height <= 0) return dataUrl;
+
+    const scale = Math.min(1, MAX_SIDE / Math.max(width, height));
+    width = Math.max(1, Math.round(width * scale));
+    height = Math.max(1, Math.round(height * scale));
+
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return dataUrl;
+
+    if (type === "image/png") {
+      ctx.drawImage(img, 0, 0, width, height);
+      return canvas.toDataURL("image/png");
+    }
+
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, width, height);
+    ctx.drawImage(img, 0, 0, width, height);
+    return canvas.toDataURL("image/jpeg", 0.82);
+  } catch {
+    return dataUrl;
+  }
 }
 
 function renderImageGallery(note) {
@@ -1304,6 +1363,21 @@ function restoreEditorSelection() {
   sel.addRange(editorSelectionRange);
 }
 
+function getEditorCaretRange() {
+  if (
+    editorSelectionRange &&
+    contentInputEl.isContentEditable &&
+    contentInputEl.contains(editorSelectionRange.commonAncestorContainer)
+  ) {
+    return editorSelectionRange.cloneRange();
+  }
+
+  const range = document.createRange();
+  range.selectNodeContents(contentInputEl);
+  range.collapse(false);
+  return range;
+}
+
 function insertTextAtCursor(text) {
   if (!contentInputEl.isContentEditable) {
     const cursor = contentInputEl.selectionStart ?? contentInputEl.value.length;
@@ -1312,11 +1386,13 @@ function insertTextAtCursor(text) {
   }
 
   contentInputEl.focus();
-  restoreEditorSelection();
   const sel = window.getSelection();
-  if (!sel || sel.rangeCount === 0) return;
+  if (!sel) return;
 
-  const range = sel.getRangeAt(0);
+  const range = getEditorCaretRange();
+  sel.removeAllRanges();
+  sel.addRange(range);
+
   range.deleteContents();
   const node = document.createTextNode(text);
   range.insertNode(node);
@@ -1365,12 +1441,12 @@ function insertMultilineTextAtCursor(text) {
   }
 
   contentInputEl.focus();
-  restoreEditorSelection();
-
   const sel = window.getSelection();
-  if (!sel || sel.rangeCount === 0) return;
+  if (!sel) return;
 
-  const range = sel.getRangeAt(0);
+  const range = getEditorCaretRange();
+  sel.removeAllRanges();
+  sel.addRange(range);
   range.deleteContents();
 
   const fragment = document.createDocumentFragment();
@@ -1397,12 +1473,12 @@ function insertCodeBlockAtCursor(codeText) {
   }
 
   contentInputEl.focus();
-  restoreEditorSelection();
-
   const sel = window.getSelection();
-  if (!sel || sel.rangeCount === 0) return;
+  if (!sel) return;
 
-  const range = sel.getRangeAt(0);
+  const range = getEditorCaretRange();
+  sel.removeAllRanges();
+  sel.addRange(range);
   range.deleteContents();
 
   const pre = document.createElement("pre");
@@ -1427,12 +1503,12 @@ function insertImageAtCursor(src, altText) {
   if (!contentInputEl.isContentEditable) return;
 
   contentInputEl.focus();
-  restoreEditorSelection();
-
   const sel = window.getSelection();
-  if (!sel || sel.rangeCount === 0) return;
+  if (!sel) return;
 
-  const range = sel.getRangeAt(0);
+  const range = getEditorCaretRange();
+  sel.removeAllRanges();
+  sel.addRange(range);
   range.deleteContents();
 
   const image = document.createElement("img");

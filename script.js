@@ -548,9 +548,11 @@ function closeAccountModal() {
 
 function render() {
   draftId = selectedId;
-  setView("home");
+  setView(currentView);
   renderList();
-  renderEditor();
+  if (document.activeElement !== contentInputEl) {
+    renderEditor();
+  }
   renderCalendar();
 }
 
@@ -607,7 +609,8 @@ function renderList() {
       const lockedClass = note.locked ? "is-locked" : "";
       const priorityTag = getPriorityChip(note.priority || 0);
       const lockTag = note.locked ? '<span class="lock-chip">PIN</span>' : "";
-      const title = escapeHtml(note.title || "Sem titulo");
+      const noteTitle = note.title && note.title !== "Nova nota" ? note.title : "";
+      const title = escapeHtml(noteTitle || generateNoteTitle(note.content) || "Sem titulo");
       const preview = note.locked
         ? "Conteudo bloqueado"
         : escapeHtml((note.content || "").slice(0, 74));

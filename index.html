@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#1ea95f">
+  <meta name="theme-color" content="#000000">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Colapso">
   <title>Colapso</title>
@@ -51,27 +51,9 @@
   <div class="bg-glow bg-glow-b" aria-hidden="true"></div>
 
   <main class="app-shell">
-    <header class="topbar">
-      <div>
-        <p class="eyebrow">Mobile first</p>
-        <div class="title-row">
-          <div class="app-brand">
-            <img class="app-logo" src="img/logoo.png" alt="Logo Colapso">
-            <h1>Colapso</h1>
-          </div>
-          <button id="themeToggleBtn" class="theme-toggle-btn" type="button" aria-label="Ativar modo escuro" title="Ativar modo escuro">
-            <span id="themeToggleIcon" class="material-symbols-rounded" aria-hidden="true">dark_mode</span>
-          </button>
-          <button id="accountBtn" class="theme-toggle-btn" type="button" aria-label="Conta" title="Conta">
-            <span class="material-symbols-rounded" aria-hidden="true">account_circle</span>
-          </button>
-        </div>
-      </div>
-    </header>
-
     <section id="notesScreen" class="screen" aria-label="Tela de notas">
       <section class="search-wrap" aria-label="Pesquisa">
-        <input id="searchInput" type="search" placeholder="Pesquisar titulo ou texto..." autocomplete="off">
+        <input id="searchInput" type="search" placeholder="Pesquisar..." autocomplete="off">
       </section>
 
       <section class="content-grid">
@@ -94,18 +76,11 @@
 
     <section id="addScreen" class="screen hidden" aria-label="Tela de adicionar nota">
       <section class="editor-panel" aria-label="Editor de nota">
-        <div class="editor-top">
-          <p class="editor-kicker">Editor de nota</p>
-          <input id="titleInput" class="title-input" type="text" placeholder="Titulo da nota">
-        </div>
-
-        <div id="contentInput" class="content-editor" contenteditable="true" data-placeholder="Escreve aqui..."></div>
+        <div id="contentInput" class="content-editor" contenteditable="true" data-placeholder="Comeca a escrever..."></div>
 
         <div id="imageGallery" class="image-gallery" aria-label="Imagens da nota"></div>
 
-        <div class="editor-footer">
-          <span id="statusText">Guardado automaticamente</span>
-        </div>
+        <span id="statusText" class="editor-footer" aria-live="polite"></span>
 
         <input id="imagePicker" type="file" accept="image/*" hidden>
       </section>
@@ -122,6 +97,9 @@
       </button>
       <button id="viewCalendarBtn" class="nav-btn" type="button" aria-label="Calendario" title="Calendario">
         <span class="material-symbols-rounded" aria-hidden="true">calendar_month</span>
+      </button>
+      <button id="accountBtn" class="nav-btn" type="button" aria-label="Conta" title="Conta">
+        <span class="material-symbols-rounded" aria-hidden="true">person</span>
       </button>
     </div>
 

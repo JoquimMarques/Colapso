@@ -44,12 +44,9 @@ const closeAccountBtnEl = document.getElementById("closeAccountBtn");
 const logoutBtnEl = document.getElementById("logoutBtn");
 
 const notesListEl = document.getElementById("notesList");
-const titleInputEl = document.getElementById("titleInput");
 const contentInputEl = document.getElementById("contentInput");
 const searchInputEl = document.getElementById("searchInput");
 const statusTextEl = document.getElementById("statusText");
-const themeToggleBtnEl = document.getElementById("themeToggleBtn");
-const themeToggleIconEl = document.getElementById("themeToggleIcon");
 
 const viewNotesBtnEl = document.getElementById("viewNotesBtn");
 const viewAddBtnEl = document.getElementById("viewAddBtn");
@@ -304,11 +301,6 @@ function bindEvents() {
     closeAccountModal();
   });
 
-  themeToggleBtnEl.addEventListener("click", () => {
-    const isDark = document.body.classList.contains("dark-theme");
-    applyTheme(isDark ? "light" : "dark");
-  });
-
   viewNotesBtnEl.addEventListener("click", () => {
     setView("home");
   });
@@ -423,10 +415,6 @@ function bindEvents() {
     queueAutoSave();
     renderEditor();
     renderList();
-  });
-
-  titleInputEl.addEventListener("input", () => {
-    saveDraftFromInputs();
   });
 
   contentInputEl.addEventListener("input", () => {
@@ -673,15 +661,13 @@ function renderEditor() {
   const note = notes.find((item) => item.id === draftId) ?? null;
 
   if (!note) {
-    titleInputEl.value = "";
     setEditorContent("");
-    statusTextEl.textContent = "Nova nota";
+    statusTextEl.textContent = "";
     imageGalleryEl.innerHTML = '<div class="image-empty"></div>';
     actionMenuHintEl.textContent = "Escolhe uma acao.";
     return;
   }
 
-  titleInputEl.value = note.title;
   const html = note.contentHtml || textToHtml(note.content || "");
   setEditorContent(html);
   statusTextEl.textContent = "Guardado automaticamente";
@@ -693,16 +679,16 @@ function openAddScreen(noteId = null) {
   draftId = noteId;
   renderEditor();
   setView("add");
-  titleInputEl.focus();
+  placeCaretAtEnd();
 }
 
 function saveDraftFromInputs() {
   const note = notes.find((item) => item.id === draftId);
   if (!note) return;
 
-  note.title = titleInputEl.value.trim() || "Nova nota";
   note.contentHtml = getEditorHtml();
   note.content = htmlToPlainText(note.contentHtml);
+  note.title = generateNoteTitle(note.content);
   note.updatedAt = Date.now();
   selectedId = note.id;
 
@@ -738,8 +724,7 @@ function applyPriority(priority) {
 
 function deleteDraftNote() {
   if (!draftId) {
-    titleInputEl.value = "";
-    contentInputEl.value = "";
+    setEditorContent("");
     statusTextEl.textContent = "Nota nova limpa";
     return;
   }
@@ -1207,9 +1192,12 @@ function renderImageGallery(note) {
   const images = Array.isArray(note.images) ? note.images : [];
 
   if (images.length === 0) {
-    imageGalleryEl.innerHTML = '<div class="image-empty">Sem imagens.</div>';
+    imageGalleryEl.innerHTML = "";
+    imageGalleryEl.classList.add("image-gallery-empty");
     return;
   }
+
+  imageGalleryEl.classList.remove("image-gallery-empty");
 
   imageGalleryEl.innerHTML = images
     .map(
@@ -1501,24 +1489,40 @@ function renderCalendar() {
 }
 
 function initTheme() {
-  const savedTheme = localStorage.getItem(THEME_KEY);
-  if (savedTheme === "dark" || savedTheme === "light") {
-    applyTheme(savedTheme);
-    return;
-  }
-
-  const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-  applyTheme(prefersDark ? "dark" : "light");
+  applyTheme("dark");
 }
 
 function applyTheme(theme) {
-  const dark = theme === "dark";
-  document.body.classList.toggle("dark-theme", dark);
-  localStorage.setItem(THEME_KEY, dark ? "dark" : "light");
+  const dark = theme === "dark" || !theme;
+  document.body.classList.add("dark-theme");
+  localStorage.setItem(THEME_KEY, "dark");
+}
 
-  themeToggleIconEl.textContent = dark ? "light_mode" : "dark_mode";
-  themeToggleBtnEl.setAttribute("aria-label", dark ? "Ativar modo claro" : "Ativar modo escuro");
-  themeToggleBtnEl.title = dark ? "Ativar modo claro" : "Ativar modo escuro";
+function generateNoteTitle(content) {
+  const text = String(content || "").replace(/\s+/g, " ").trim();
+  if (!text) return "Nova nota";
+
+  const words = text.split(" ");
+  let title = words[0] || "";
+  if (words[1]) title += " " + words[1];
+  return title;
+}
+
+function placeCaretAtEnd() {
+  const el = contentInputEl;
+  if (!el.isContentEditable) return;
+
+  try {
+    const sel = window.getSelection();
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    range.collapse(false);
+    sel.removeAllRanges();
+    sel.addRange(range);
+    el.focus();
+  } catch {
+    el.focus();
+  }
 }
 
 function getNoteCountByDay(year, month) {

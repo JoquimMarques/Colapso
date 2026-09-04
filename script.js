@@ -550,10 +550,10 @@ function render() {
   draftId = selectedId;
   setView(currentView);
   renderList();
-  if (document.activeElement !== contentInputEl) {
+  renderCalendar();
+  if (currentView !== "add") {
     renderEditor();
   }
-  renderCalendar();
 }
 
 function setView(view) {
@@ -697,7 +697,6 @@ function saveDraftFromInputs() {
 
   statusTextEl.textContent = "A guardar...";
   queueAutoSave();
-  renderList();
 }
 
 function queueAutoSave() {

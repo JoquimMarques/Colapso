@@ -1,6 +1,6 @@
-const STATIC_CACHE = "colapso-static-v2";
-const RUNTIME_CACHE = "colapso-runtime-v2";
-const FONT_CACHE = "colapso-fonts-v2";
+const STATIC_CACHE = "colapso-static-v3";
+const RUNTIME_CACHE = "colapso-runtime-v3";
+const FONT_CACHE = "colapso-fonts-v3";
 
 const APP_SHELL_FILES = [
   "./",
@@ -30,31 +30,19 @@ self.addEventListener("fetch", (event) => {
 
   const url = new URL(event.request.url);
 
+  // Same origin: shell (HTML) network-first, assets update-in-background
+  // (stale-while-revalidate) so a new release always reaches the device
+  // while still working fully offline afterwards.
   if (url.origin === self.location.origin) {
-    if (event.request.mode === "navigate") {
-      event.respondWith(networkFirst(event.request));
-      return;
-    }
-
-    event.respondWith(cacheFirst(event.request));
+    event.respondWith(networkFirst(event.request));
     return;
   }
 
-  // Cache Google Fonts to keep typography/icons available offline after first load.
+  // Cache Google Fonts to keep typography available offline after first load.
   if (url.origin.includes("fonts.googleapis.com") || url.origin.includes("fonts.gstatic.com")) {
     event.respondWith(staleWhileRevalidate(event.request, FONT_CACHE));
   }
 });
-
-async function cacheFirst(request) {
-  const cached = await caches.match(request);
-  if (cached) return cached;
-
-  const response = await fetch(request);
-  const cache = await caches.open(RUNTIME_CACHE);
-  cache.put(request, response.clone());
-  return response;
-}
 
 async function networkFirst(request) {
   try {

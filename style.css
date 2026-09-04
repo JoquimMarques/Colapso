@@ -387,17 +387,29 @@ textarea::placeholder {
   opacity: 1;
 }
 
+.ico {
+  display: block;
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+  flex: 0 0 auto;
+}
+
 .note-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  flex-wrap: wrap;
+  row-gap: 4px;
+  min-width: 0;
 }
 
 .note-head h3 {
   margin: 0;
   font-size: 1.02rem;
   font-weight: 700;
+  flex: 1 1 auto;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -409,7 +421,6 @@ textarea::placeholder {
   align-items: center;
   gap: 6px;
   flex: 0 0 auto;
-  max-width: 55%;
 }
 
 .note-meta {
@@ -713,10 +724,9 @@ textarea {
   cursor: not-allowed;
 }
 
-.nav-btn .material-symbols-rounded {
-  font-size: 24px;
-  line-height: 1;
-  font-variation-settings: "FILL" 0, "wght" 500, "GRAD" 0, "opsz" 24;
+.nav-btn svg.ico {
+  width: 24px;
+  height: 24px;
 }
 
 .nav-btn-center {
@@ -729,9 +739,9 @@ textarea {
   border: 0;
 }
 
-.nav-btn-center .material-symbols-rounded {
-  font-size: 30px;
-  font-variation-settings: "FILL" 1, "wght" 500, "GRAD" 0, "opsz" 24;
+.nav-btn-center svg.ico {
+  width: 30px;
+  height: 30px;
 }
 
 .nav-btn-center:hover,
@@ -819,8 +829,12 @@ textarea {
   place-items: center;
 }
 
-.priority-btn .material-symbols-rounded {
-  font-size: 24px;
+.prio-num {
+  font-family: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 1.05rem;
+  font-weight: 800;
+  line-height: 1;
+  color: inherit;
 }
 
 .priority-btn.p-low {
@@ -859,8 +873,9 @@ textarea {
   place-items: center;
 }
 
-.menu-icon-btn .material-symbols-rounded {
-  font-size: 24px;
+.menu-icon-btn svg.ico {
+  width: 24px;
+  height: 24px;
 }
 
 .menu-icon-btn.danger {
@@ -885,8 +900,9 @@ textarea {
   cursor: pointer;
 }
 
-.modal-x-btn .material-symbols-rounded {
-  font-size: 20px;
+.modal-x-btn svg.ico {
+  width: 20px;
+  height: 20px;
 }
 
 .pin-preview {

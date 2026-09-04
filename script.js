@@ -163,6 +163,18 @@ async function initFirebase() {
     firebaseAuth = window.firebase.auth(firebaseApp);
     firestore = window.firebase.firestore(firebaseApp);
 
+    try {
+      await firestore.enablePersistence({ synchronizeTabs: false });
+    } catch (err) {
+      if (err && err.code === "failed-precondition") {
+        console.warn("Colapso: multiplos separadores abertos — persistencia offline desativada neste separador.");
+      } else if (err && err.code === "unimplemented") {
+        console.warn("Colapso: este browser nao suporta persistencia offline.");
+      } else {
+        console.warn("Colapso: falha ao ativar persistencia offline.", err);
+      }
+    }
+
     if (!navigator.onLine) {
       authLockHintEl.textContent = "Sem ligacao a internet. Inicia sessao para continuar.";
     }
@@ -183,7 +195,7 @@ function bindAuth() {
 async function handleAuthStateChange(user) {
   if (user) {
     currentUser = user;
-    notes = [];
+    notes = loadLocalBackup();
     firstSyncDone = false;
 
     authLockScreenEl.classList.add("hidden");
@@ -215,8 +227,18 @@ function startNotesSubscription() {
     (snapshot) => {
       const incoming = snapshot.docs.map((doc) => normalizeNote(doc.id, doc.data()));
 
-      // Merge with local drafts not yet persisted.
-      const localOnly = notes.filter((n) => !incoming.some((i) => i.id === n.id));
+      // Merge with local drafts not yet persisted. When a local-only note is
+      // newer than the server copy, keep the local version (offline edits).
+      const incomingIds = new Set(incoming.map((i) => i.id));
+      const localOnly = notes.filter((n) => {
+        if (!incomingIds.has(n.id)) return true;
+        const server = incoming.find((i) => i.id === n.id);
+        if (n.isLocalOnly && Number(n.updatedAt) > Number(server.updatedAt)) {
+          incoming.splice(incoming.indexOf(server), 1);
+          return true;
+        }
+        return false;
+      });
       notes = [...incoming, ...localOnly];
 
       sortNotes();
@@ -1119,13 +1141,29 @@ function sortNotes() {
   });
 }
 
+function loadLocalBackup() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter((n) => n && typeof n.id !== "undefined");
+  } catch {
+    return [];
+  }
+}
+
 function persist() {
+  const backup = notes.filter(
+    (n) => !(n.isLocalOnly && n.title === "Nova nota" && !n.content && !n.contentHtml)
+  );
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(backup));
+  } catch {
+    // Storage may be unavailable.
+  }
+
   if (!firestore || !currentUser) {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
-    } catch {
-      // Storage may be unavailable.
-    }
     return;
   }
 

@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:FILL@0..1&display=swap" rel="stylesheet">
+  
   <link rel="stylesheet" href="style.css">
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
@@ -90,25 +90,25 @@
   <nav class="bottom-nav" aria-label="Mudar de tela">
     <div id="mainNav" class="app-nav" aria-label="Navegacao principal">
       <button id="viewCalendarBtn" class="nav-btn" type="button" aria-label="Calendario" title="Calendario">
-        <span class="material-symbols-rounded" aria-hidden="true">calendar_month</span>
+        <svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 4h-1V2h-2v2H8V2H6v2H5C3.9 4 3 4.9 3 6v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM7 11h5v5H7z"/></svg>
       </button>
       <button id="viewAddBtn" class="nav-btn nav-btn-center" type="button" aria-label="Criar nota" title="Criar nota">
-        <span class="material-symbols-rounded" aria-hidden="true">add</span>
+        <svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
       </button>
       <button id="accountBtn" class="nav-btn" type="button" aria-label="Conta" title="Conta">
-        <span class="material-symbols-rounded" aria-hidden="true">person</span>
+        <svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
       </button>
     </div>
 
     <div id="addNav" class="app-nav hidden" aria-label="Acoes da nota">
       <button id="editorBackBtn" class="nav-btn" type="button" aria-label="Voltar" title="Voltar">
-        <span class="material-symbols-rounded" aria-hidden="true">arrow_back</span>
+        <svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
       </button>
       <button id="toolbarVoiceBtn" class="nav-btn" type="button" aria-label="Nota por voz" title="Nota por voz">
-        <span class="material-symbols-rounded" aria-hidden="true">mic</span>
+        <svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></svg>
       </button>
       <button id="addActionsBtn" class="nav-btn nav-btn-success" type="button" aria-label="Acoes da nota" title="Acoes da nota">
-        <span class="material-symbols-rounded" aria-hidden="true">tune</span>
+        <svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zM13 21v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/></svg>
       </button>
     </div>
   </nav>
@@ -116,7 +116,7 @@
   <div id="accountModal" class="modal-overlay hidden" aria-hidden="true">
     <div class="sheet-card" role="dialog" aria-modal="true" aria-label="Conta">
       <button id="closeAccountBtn" class="modal-x-btn" type="button" aria-label="Fechar conta" title="Fechar conta">
-        <span class="material-symbols-rounded" aria-hidden="true">close</span>
+        <svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
       </button>
       <h3>Conta</h3>
       <div id="accountInfo" class="account-info"></div>
@@ -127,32 +127,32 @@
   <div id="actionMenuModal" class="modal-overlay hidden" aria-hidden="true">
     <div class="sheet-card" role="dialog" aria-modal="true" aria-label="Acoes da nota">
       <button id="closeActionMenuBtn" class="modal-x-btn" type="button" aria-label="Fechar acoes" title="Fechar acoes">
-        <span class="material-symbols-rounded" aria-hidden="true">close</span>
+        <svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
       </button>
       <h3>Acoes da nota</h3>
       <p id="actionMenuHint" class="modal-hint">Escolhe uma acao.</p>
 
       <div class="priority-group" aria-label="Definir prioridade">
         <button class="priority-btn p-low" type="button" data-priority="1" aria-label="Prioridade baixa" title="Prioridade baixa">
-          <span class="material-symbols-rounded" aria-hidden="true">looks_one</span>
+          <b class="prio-num">1</b>
         </button>
         <button class="priority-btn p-mid" type="button" data-priority="2" aria-label="Prioridade media" title="Prioridade media">
-          <span class="material-symbols-rounded" aria-hidden="true">looks_two</span>
+          <b class="prio-num">2</b>
         </button>
         <button class="priority-btn p-high" type="button" data-priority="3" aria-label="Prioridade alta" title="Prioridade alta">
-          <span class="material-symbols-rounded" aria-hidden="true">looks_3</span>
+          <b class="prio-num">3</b>
         </button>
       </div>
 
       <div class="modal-icon-actions">
         <button id="menuImageBtn" class="menu-icon-btn" type="button" aria-label="Adicionar imagem" title="Adicionar imagem">
-          <span class="material-symbols-rounded" aria-hidden="true">image</span>
+          <svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
         </button>
         <button id="menuLockBtn" class="menu-icon-btn" type="button" aria-label="Bloquear com PIN" title="Bloquear com PIN">
-          <span class="material-symbols-rounded" aria-hidden="true">lock</span>
+          <svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
         </button>
         <button id="menuDeleteBtn" class="menu-icon-btn danger" type="button" aria-label="Eliminar nota" title="Eliminar nota">
-          <span class="material-symbols-rounded" aria-hidden="true">delete</span>
+          <svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
         </button>
       </div>
     </div>

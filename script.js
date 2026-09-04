@@ -132,9 +132,31 @@ function init() {
 
 async function initFirebase() {
   const missing = Object.values(firebaseConfig).filter((v) => !v);
+
   if (missing.length || !window.firebase) {
-    setAuthStatus("Configuracao Firebase em falta. Define as variaveis VITE_FIREBASE_*.");
-    authLockHintEl.textContent = "Configuracao Firebase em falta. Verifica as variaveis de ambiente.";
+    const rawSingle = String(import.meta.env.VITE_FIREBASE || "").trim();
+    let looksLikeAdminKey = false;
+    if (rawSingle) {
+      try {
+        const parsedGuess = JSON.parse(rawSingle);
+        looksLikeAdminKey =
+          parsedGuess && typeof parsedGuess === "object" && Boolean(parsedGuess.private_key) && !parsedGuess.apiKey;
+      } catch {
+        // Not JSON — general error shown below.
+      }
+    }
+
+    if (looksLikeAdminKey) {
+      setAuthStatus(
+        "VITE_FIREBASE nao e o firebaseConfig do Web App. Parece a chave de service account (Admin SDK)."
+      );
+      authLockHintEl.textContent =
+        "Coloca na VITE_FIREBASE o objeto firebaseConfig (apiKey, authDomain, projectId, appId...) do teu app web no Firebase Console, nao o JSON de service account.";
+    } else {
+      setAuthStatus("Configuracao Firebase em falta. Define a variavel VITE_FIREBASE com o firebaseConfig do Web App.");
+      authLockHintEl.textContent =
+        "Configuracao Firebase em falta. Verifica a variavel de ambiente VITE_FIREBASE (JSON do firebaseConfig).";
+    }
     return;
   }
 

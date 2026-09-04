@@ -398,12 +398,18 @@ textarea::placeholder {
   margin: 0;
   font-size: 1.02rem;
   font-weight: 700;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .note-tags {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  flex: 0 0 auto;
+  max-width: 55%;
 }
 
 .note-meta {
@@ -432,47 +438,64 @@ textarea::placeholder {
   }
 }
 
-.pin-chip {
-  font-size: 0.68rem;
-  color: #a1a1aa;
-  background: #1a1a1a;
-  border: 1px solid #2e2e2e;
+.prio-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: capitalize;
   border-radius: 999px;
-  padding: 3px 7px;
-  font-weight: 700;
+  padding: 3px 8px;
+  border: 1px solid rgba(30, 169, 95, 0.5);
+  color: #6be3a0;
+  background: rgba(30, 169, 95, 0.1);
+  white-space: nowrap;
 }
 
-.pin-chip::before {
-  content: "•";
-  margin-right: 4px;
+.prio-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #1ea95f;
+  box-shadow: 0 0 6px rgba(30, 169, 95, 0.8);
 }
 
-.pin-chip.p-low {
+.prio-chip.p-low {
   color: #fde047;
-  background: rgba(250, 204, 21, 0.12);
-  border-color: rgba(250, 204, 21, 0.35);
+  border-color: rgba(250, 204, 21, 0.5);
+  background: rgba(250, 204, 21, 0.1);
 }
 
-.pin-chip.p-mid {
+.prio-chip.p-low .prio-dot {
+  background: #fde047;
+  box-shadow: 0 0 6px rgba(250, 204, 21, 0.8);
+}
+
+.prio-chip.p-mid {
   color: #fdba74;
-  background: rgba(251, 146, 60, 0.12);
-  border-color: rgba(251, 146, 60, 0.35);
+  border-color: rgba(251, 146, 60, 0.5);
+  background: rgba(251, 146, 60, 0.1);
 }
 
-.pin-chip.p-high {
-  color: #fda4af;
-  background: rgba(251, 113, 133, 0.12);
-  border-color: rgba(251, 113, 133, 0.35);
+.prio-chip.p-mid .prio-dot {
+  background: #fdba74;
+  box-shadow: 0 0 6px rgba(251, 146, 60, 0.8);
 }
 
 .lock-chip {
-  font-size: 0.68rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.66rem;
   font-weight: 700;
   border-radius: 999px;
   padding: 3px 8px;
   border: 1px solid #3a3a3a;
   color: #a1a1aa;
   background: #161616;
+  white-space: nowrap;
 }
 
 .editor-panel {

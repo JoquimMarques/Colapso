@@ -1192,15 +1192,15 @@ function getPriorityLabel(priority) {
 
 function getPriorityChip(priority) {
   if (priority === 3) {
-    return '<span class="pin-chip p-high">Alta</span>';
+    return '<span class="prio-chip p-high"><span class="prio-dot"></span>Alta</span>';
   }
 
   if (priority === 2) {
-    return '<span class="pin-chip p-mid">Media</span>';
+    return '<span class="prio-chip p-mid"><span class="prio-dot"></span>Media</span>';
   }
 
   if (priority === 1) {
-    return '<span class="pin-chip p-low">Baixa</span>';
+    return '<span class="prio-chip p-low"><span class="prio-dot"></span>Baixa</span>';
   }
 
   return "";

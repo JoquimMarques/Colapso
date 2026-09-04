@@ -648,11 +648,11 @@ function renderList() {
       return `
         <button class="note-item ${activeClass} ${priorityClass} ${lockedClass}" data-id="${note.id}" style="animation-delay:${delay}ms">
           <div class="note-head">
-            <h3>${title}</h3>
             <div class="note-tags">
               ${priorityTag}
               ${lockTag}
             </div>
+            <h3>${title}</h3>
           </div>
           <div class="note-meta">${date}</div>
           ${preview ? `<div class="note-meta note-preview">${preview}</div>` : ""}

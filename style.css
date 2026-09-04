@@ -357,6 +357,8 @@ textarea::placeholder {
   cursor: pointer;
   transition: transform 0.2s ease, background 0.2s ease;
   animation: card-rise 0.35s ease both;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .note-item::before {
@@ -400,9 +402,9 @@ textarea::placeholder {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  flex-wrap: wrap;
-  row-gap: 4px;
+  flex-wrap: nowrap;
   min-width: 0;
+  max-width: 100%;
 }
 
 .note-head h3 {
@@ -421,6 +423,7 @@ textarea::placeholder {
   align-items: center;
   gap: 6px;
   flex: 0 0 auto;
+  max-width: 45%;
 }
 
 .note-meta {

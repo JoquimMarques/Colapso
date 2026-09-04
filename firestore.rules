@@ -1,0 +1,31 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Apenas utilizadores autenticados acedem aos dados.
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // O documento pertence ao utilizador autenticado.
+    function isOwner(doc) {
+      return isAuthenticated() && doc.data.ownerId == request.auth.uid;
+    }
+
+    // Colecao de notas: cada utilizador so le/escreve as suas proprias notas.
+    match /notes/{noteId} {
+      allow read: if isOwner(resource);
+      allow create: if isAuthenticated() && request.resource.data.ownerId == request.auth.uid;
+      allow update: if isOwner(resource) && request.resource.data.ownerId == request.auth.uid;
+      allow delete: if isOwner(resource);
+    }
+
+    // Colecao de perfis de utilizador (opcional).
+    match /users/{userId} {
+      allow read: if isAuthenticated() && request.auth.uid == userId;
+      allow create, update: if isAuthenticated() && request.auth.uid == userId;
+      allow delete: if false;
+    }
+  }
+}

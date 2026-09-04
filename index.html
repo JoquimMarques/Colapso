@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#1ea95f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Colapso">
+  <title>Colapso</title>
+  <link rel="icon" type="image/x-icon" href="img/favicon (1)/favicon.ico">
+  <link rel="icon" type="image/svg+xml" href="img/favicon (1)/favicon.svg">
+  <link rel="icon" type="image/png" sizes="96x96" href="img/favicon (1)/favicon-96x96.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="img/favicon (1)/apple-touch-icon.png">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:FILL@0..1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <section id="authLockScreen" class="startup-lock" aria-label="Autenticacao">
+    <div class="startup-card auth-card" role="dialog" aria-modal="true" aria-label="Iniciar sessao">
+      <div class="startup-top">
+        <img class="startup-lock-logo" src="img/logoo.png" alt="Colapso">
+        <h2>Colapso</h2>
+      </div>
+
+      <div class="startup-bottom">
+        <p id="authLockHint" class="startup-hint">Inicia sessao para continuares a usar o Colapso e guardares as tuas notas.</p>
+
+        <button id="googleLoginBtn" class="google-login-btn" type="button">
+          <svg class="google-g" aria-hidden="true" viewBox="0 0 48 48" width="20" height="20">
+            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+          </svg>
+          Continuar com Google
+        </button>
+
+        <p id="authStatus" class="auth-status" aria-live="polite"></p>
+      </div>
+    </div>
+  </section>
+
+  <div class="bg-glow bg-glow-a" aria-hidden="true"></div>
+  <div class="bg-glow bg-glow-b" aria-hidden="true"></div>
+
+  <main class="app-shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Mobile first</p>
+        <div class="title-row">
+          <div class="app-brand">
+            <img class="app-logo" src="img/logoo.png" alt="Logo Colapso">
+            <h1>Colapso</h1>
+          </div>
+          <button id="themeToggleBtn" class="theme-toggle-btn" type="button" aria-label="Ativar modo escuro" title="Ativar modo escuro">
+            <span id="themeToggleIcon" class="material-symbols-rounded" aria-hidden="true">dark_mode</span>
+          </button>
+          <button id="accountBtn" class="theme-toggle-btn" type="button" aria-label="Conta" title="Conta">
+            <span class="material-symbols-rounded" aria-hidden="true">account_circle</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <section id="notesScreen" class="screen" aria-label="Tela de notas">
+      <section class="search-wrap" aria-label="Pesquisa">
+        <input id="searchInput" type="search" placeholder="Pesquisar titulo ou texto..." autocomplete="off">
+      </section>
+
+      <section class="content-grid">
+        <aside class="notes-panel" aria-label="Lista de notas">
+          <div id="notesList" class="notes-list"></div>
+        </aside>
+      </section>
+    </section>
+
+    <section id="calendarScreen" class="screen hidden" aria-label="Tela de calendario">
+      <section class="calendar-panel" aria-label="Calendario mensal">
+        <div class="calendar-header">
+          <p class="calendar-kicker">Tema calendario</p>
+          <h2 id="calendarTitle">Calendario</h2>
+        </div>
+        <div id="calendarWeekdays" class="calendar-weekdays" aria-hidden="true"></div>
+        <div id="calendarGrid" class="calendar-grid"></div>
+      </section>
+    </section>
+
+    <section id="addScreen" class="screen hidden" aria-label="Tela de adicionar nota">
+      <section class="editor-panel" aria-label="Editor de nota">
+        <div class="editor-top">
+          <p class="editor-kicker">Editor de nota</p>
+          <input id="titleInput" class="title-input" type="text" placeholder="Titulo da nota">
+        </div>
+
+        <div id="contentInput" class="content-editor" contenteditable="true" data-placeholder="Escreve aqui..."></div>
+
+        <div id="imageGallery" class="image-gallery" aria-label="Imagens da nota"></div>
+
+        <div class="editor-footer">
+          <span id="statusText">Guardado automaticamente</span>
+        </div>
+
+        <input id="imagePicker" type="file" accept="image/*" hidden>
+      </section>
+    </section>
+  </main>
+
+  <nav class="bottom-nav" aria-label="Mudar de tela">
+    <div id="mainNav" class="app-nav" aria-label="Navegacao principal">
+      <button id="viewNotesBtn" class="nav-btn is-active" type="button" aria-label="Inicio" title="Inicio">
+        <span class="material-symbols-rounded" aria-hidden="true">home</span>
+      </button>
+      <button id="viewAddBtn" class="nav-btn nav-btn-center" type="button" aria-label="Criar nota" title="Criar nota">
+        <span class="material-symbols-rounded" aria-hidden="true">add</span>
+      </button>
+      <button id="viewCalendarBtn" class="nav-btn" type="button" aria-label="Calendario" title="Calendario">
+        <span class="material-symbols-rounded" aria-hidden="true">calendar_month</span>
+      </button>
+    </div>
+
+    <div id="addNav" class="app-nav hidden" aria-label="Acoes da nota">
+      <button id="editorBackBtn" class="nav-btn" type="button" aria-label="Voltar" title="Voltar">
+        <span class="material-symbols-rounded" aria-hidden="true">arrow_back</span>
+      </button>
+      <button id="toolbarVoiceBtn" class="nav-btn" type="button" aria-label="Nota por voz" title="Nota por voz">
+        <span class="material-symbols-rounded" aria-hidden="true">mic</span>
+      </button>
+      <button id="addActionsBtn" class="nav-btn nav-btn-success" type="button" aria-label="Acoes da nota" title="Acoes da nota">
+        <span class="material-symbols-rounded" aria-hidden="true">tune</span>
+      </button>
+    </div>
+  </nav>
+
+  <div id="accountModal" class="modal-overlay hidden" aria-hidden="true">
+    <div class="sheet-card" role="dialog" aria-modal="true" aria-label="Conta">
+      <button id="closeAccountBtn" class="modal-x-btn" type="button" aria-label="Fechar conta" title="Fechar conta">
+        <span class="material-symbols-rounded" aria-hidden="true">close</span>
+      </button>
+      <h3>Conta</h3>
+      <div id="accountInfo" class="account-info"></div>
+      <button id="logoutBtn" class="logout-btn" type="button">Terminar sessao</button>
+    </div>
+  </div>
+
+  <div id="actionMenuModal" class="modal-overlay hidden" aria-hidden="true">
+    <div class="sheet-card" role="dialog" aria-modal="true" aria-label="Acoes da nota">
+      <button id="closeActionMenuBtn" class="modal-x-btn" type="button" aria-label="Fechar acoes" title="Fechar acoes">
+        <span class="material-symbols-rounded" aria-hidden="true">close</span>
+      </button>
+      <h3>Acoes da nota</h3>
+      <p id="actionMenuHint" class="modal-hint">Escolhe uma acao.</p>
+
+      <div class="priority-group" aria-label="Definir prioridade">
+        <button class="priority-btn p-low" type="button" data-priority="1" aria-label="Prioridade baixa" title="Prioridade baixa">
+          <span class="material-symbols-rounded" aria-hidden="true">looks_one</span>
+        </button>
+        <button class="priority-btn p-mid" type="button" data-priority="2" aria-label="Prioridade media" title="Prioridade media">
+          <span class="material-symbols-rounded" aria-hidden="true">looks_two</span>
+        </button>
+        <button class="priority-btn p-high" type="button" data-priority="3" aria-label="Prioridade alta" title="Prioridade alta">
+          <span class="material-symbols-rounded" aria-hidden="true">looks_3</span>
+        </button>
+      </div>
+
+      <div class="modal-icon-actions">
+        <button id="menuImageBtn" class="menu-icon-btn" type="button" aria-label="Adicionar imagem" title="Adicionar imagem">
+          <span class="material-symbols-rounded" aria-hidden="true">image</span>
+        </button>
+        <button id="menuLockBtn" class="menu-icon-btn" type="button" aria-label="Bloquear com PIN" title="Bloquear com PIN">
+          <span class="material-symbols-rounded" aria-hidden="true">lock</span>
+        </button>
+        <button id="menuDeleteBtn" class="menu-icon-btn danger" type="button" aria-label="Eliminar nota" title="Eliminar nota">
+          <span class="material-symbols-rounded" aria-hidden="true">delete</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="pinModal" class="modal-overlay hidden" aria-hidden="true">
+    <div class="pin-card" role="dialog" aria-modal="true" aria-label="PIN da nota">
+      <h3 id="pinTitle">PIN da nota</h3>
+      <p id="pinHint" class="modal-hint">Introduz o PIN.</p>
+      <div id="pinPreview" class="pin-preview">○ ○ ○ ○</div>
+
+      <div id="pinKeyboard" class="pin-keyboard">
+        <button type="button" class="pin-key" data-key="1">1</button>
+        <button type="button" class="pin-key" data-key="2">2</button>
+        <button type="button" class="pin-key" data-key="3">3</button>
+        <button type="button" class="pin-key" data-key="4">4</button>
+        <button type="button" class="pin-key" data-key="5">5</button>
+        <button type="button" class="pin-key" data-key="6">6</button>
+        <button type="button" class="pin-key" data-key="7">7</button>
+        <button type="button" class="pin-key" data-key="8">8</button>
+        <button type="button" class="pin-key" data-key="9">9</button>
+        <button type="button" class="pin-key pin-secondary" data-key="clear">Limpar</button>
+        <button type="button" class="pin-key" data-key="0">0</button>
+        <button type="button" class="pin-key pin-confirm" data-key="ok">OK</button>
+      </div>
+
+      <button id="closePinModalBtn" class="menu-close-btn" type="button">Cancelar</button>
+    </div>
+  </div>
+
+  <div id="voiceFallbackModal" class="modal-overlay hidden" aria-hidden="true">
+    <div class="pin-card voice-fallback-card" role="dialog" aria-modal="true" aria-label="Fallback de voz">
+      <h3>Entrada manual de voz</h3>
+      <p id="voiceFallbackHint" class="modal-hint">Se o ditado nao funcionar, escreve aqui e insere no editor.</p>
+      <textarea id="voiceFallbackInput" class="voice-fallback-input" rows="5" placeholder="Escreve o texto que querias ditar..."></textarea>
+      <div class="voice-fallback-actions">
+        <button id="voiceFallbackCancelBtn" class="menu-close-btn" type="button">Cancelar</button>
+        <button id="voiceFallbackInsertBtn" class="pin-key pin-confirm voice-fallback-insert" type="button">Inserir texto</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/script.js"></script>
+</body>
+</html>

@@ -1,4 +1,5 @@
 :root {
+  color-scheme: dark;
   --bg-main: #000000;
   --bg-soft: #0a0a0a;
   --bg-elev: #111111;
@@ -736,7 +737,7 @@ textarea {
   width: 56px;
   height: 56px;
   margin-inline: 0;
-  transform: translateY(-4px);
+  transform: none;
   background: linear-gradient(135deg, #29bd6f, #159a53);
   color: #ffffff;
   border: 0;
@@ -749,11 +750,11 @@ textarea {
 
 .nav-btn-center:hover,
 .nav-btn-center:focus-visible {
-  transform: translateY(-8px);
+  transform: translateY(-3px);
 }
 
 .nav-btn-center:active {
-  transform: translateY(-7px) scale(0.96);
+  transform: translateY(0) scale(0.96);
 }
 
 .nav-btn.is-active {
@@ -1297,5 +1298,388 @@ body.is-add-view .content-editor {
 
 .logout-btn:active {
   background: rgba(207, 60, 60, 0.16);
+}
+
+/* ===== Arranque da sessao ===== */
+
+.auth-loading {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 52px;
+  color: var(--ink-soft);
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.auth-spinner {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  border: 2px solid rgba(139, 139, 143, 0.3);
+  border-top-color: var(--brand);
+  animation: auth-spin 0.75s linear infinite;
+}
+
+@keyframes auth-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.auth-actions {
+  width: 100%;
+  display: grid;
+  gap: 14px;
+  justify-items: center;
+}
+
+/* ===== Botao de tema ===== */
+
+.ico-stroke {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.theme-row-btn .ico-moon {
+  display: none;
+}
+
+.theme-row-btn .ico-sun {
+  display: block;
+}
+
+body.light-theme .theme-row-btn .ico-moon {
+  display: block;
+}
+
+body.light-theme .theme-row-btn .ico-sun {
+  display: none;
+}
+
+.theme-row-btn {
+  width: 100%;
+  min-height: 46px;
+  margin-top: 4px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--bg-elev-2);
+  color: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.theme-row-btn .ico {
+  width: 20px;
+  height: 20px;
+}
+
+.theme-row-btn:active {
+  transform: translateY(1px);
+}
+
+/* ===== Scrollbar invisivel (mobile + desktop) ===== */
+
+html {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+body,
+.screen,
+.notes-list,
+.notes-panel,
+.content-editor,
+.editor-panel,
+.calendar-panel,
+.modal-overlay,
+.sheet-card,
+.pin-card {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  background: transparent;
+  display: none;
+}
+
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-thumb,
+::-webkit-scrollbar-corner {
+  display: none;
+  background: transparent;
+}
+
+/* ===== Modo claro ===== */
+
+body.light-theme {
+  color-scheme: light;
+  --bg-main: #f4f6f4;
+  --bg-soft: #ffffff;
+  --bg-elev: #ffffff;
+  --bg-elev-2: #f0f2f0;
+  --line: #e2e5e2;
+  --ink: #141714;
+  --ink-soft: #6b716b;
+  --shadow: 0 14px 34px rgba(17, 24, 20, 0.12);
+
+  background: var(--bg-main);
+}
+
+body.light-theme .startup-lock {
+  background: #eef1ee;
+}
+
+body.light-theme .startup-card {
+  background: #ffffff;
+  border-color: #e2e5e2;
+}
+
+body.light-theme .startup-top {
+  background: linear-gradient(180deg, #ffffff 0%, #f1f4f1 100%);
+}
+
+body.light-theme .startup-top h2 {
+  color: var(--ink);
+}
+
+body.light-theme .startup-hint,
+body.light-theme .auth-status,
+body.light-theme .auth-loading {
+  color: var(--ink-soft);
+}
+
+body.light-theme .search-wrap input {
+  background: #ffffff;
+}
+
+body.light-theme .search-wrap::before,
+body.light-theme .search-wrap input::placeholder {
+  color: #8b918b;
+}
+
+body.light-theme .note-item:hover,
+body.light-theme .note-item:focus-visible {
+  background: rgba(30, 169, 95, 0.08);
+}
+
+body.light-theme .note-item.active {
+  background: rgba(30, 169, 95, 0.1);
+}
+
+body.light-theme .note-preview,
+body.light-theme .note-meta,
+body.light-theme .empty-state {
+  color: var(--ink-soft);
+}
+
+body.light-theme .prio-chip {
+  color: #0f7a44;
+  border-color: rgba(30, 169, 95, 0.45);
+  background: rgba(30, 169, 95, 0.1);
+}
+
+body.light-theme .prio-chip.p-low {
+  color: #8a6a00;
+  border-color: rgba(202, 138, 4, 0.45);
+  background: rgba(250, 204, 21, 0.18);
+}
+
+body.light-theme .prio-chip.p-low .prio-dot {
+  background: #ca8a04;
+  box-shadow: none;
+}
+
+body.light-theme .prio-chip.p-mid {
+  color: #9a4a10;
+  border-color: rgba(251, 146, 60, 0.5);
+  background: rgba(251, 146, 60, 0.16);
+}
+
+body.light-theme .prio-chip.p-mid .prio-dot {
+  background: #ea580c;
+  box-shadow: none;
+}
+
+body.light-theme .lock-chip {
+  border-color: #dcdfdc;
+  background: #f0f2f0;
+  color: #5d635d;
+}
+
+body.light-theme .content-editor {
+  color: var(--ink);
+}
+
+body.light-theme .content-editor .inline-editor-image,
+body.light-theme .image-card {
+  background: #ffffff;
+  border-color: #e5e7e5;
+}
+
+body.light-theme .content-editor .editor-code-block {
+  background: #f1f4f1;
+  border-color: #e2e5e2;
+  color: #2b312b;
+}
+
+body.light-theme .image-remove {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: #dcdedc;
+  color: #3a3f3a;
+}
+
+body.light-theme textarea {
+  background: #ffffff;
+  color: var(--ink);
+}
+
+body.light-theme .app-nav {
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 10px 30px rgba(20, 40, 30, 0.14), 0 0 0 6px rgba(30, 169, 95, 0.06),
+    0 0 24px rgba(30, 169, 95, 0.1);
+}
+
+body.light-theme .nav-btn {
+  background: #eef1ee;
+  color: #5c625c;
+}
+
+body.light-theme .nav-btn.is-active {
+  background: #ddf2e6;
+  color: #0f7a44;
+  box-shadow: none;
+}
+
+body.light-theme .nav-btn.is-recording {
+  background: #e5484d;
+  color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(229, 72, 77, 0.2);
+}
+
+body.light-theme .modal-overlay {
+  background: rgba(238, 241, 238, 0.66);
+}
+
+body.light-theme .sheet-card,
+body.light-theme .pin-card {
+  background: #ffffff;
+  border-color: #e2e5e2;
+  box-shadow: 0 20px 50px rgba(20, 30, 25, 0.16);
+}
+
+body.light-theme .sheet-card h3,
+body.light-theme .pin-card h3,
+body.light-theme .pin-preview {
+  color: var(--ink);
+}
+
+body.light-theme .modal-hint {
+  color: var(--ink-soft);
+}
+
+body.light-theme .priority-btn,
+body.light-theme .menu-icon-btn,
+body.light-theme .modal-x-btn,
+body.light-theme .pin-key,
+body.light-theme .menu-close-btn {
+  background: #f4f6f4;
+  border-color: #e2e5e2;
+  color: #2b312b;
+}
+
+body.light-theme .priority-btn.p-low {
+  background: rgba(250, 204, 21, 0.2);
+  border-color: rgba(202, 138, 4, 0.4);
+  color: #8a6a00;
+}
+
+body.light-theme .priority-btn.p-mid {
+  background: rgba(251, 146, 60, 0.18);
+  border-color: rgba(251, 146, 60, 0.45);
+  color: #9a4a10;
+}
+
+body.light-theme .priority-btn.p-high {
+  background: rgba(251, 113, 133, 0.18);
+  border-color: rgba(251, 113, 133, 0.45);
+  color: #be123c;
+}
+
+body.light-theme .menu-icon-btn.danger {
+  background: #fdecec;
+  border-color: #f3c9c9;
+  color: #c0272d;
+}
+
+body.light-theme .pin-key.pin-secondary {
+  background: #eceeee;
+}
+
+body.light-theme .pin-key.pin-confirm {
+  background: #1ea95f;
+  border-color: #1ea95f;
+  color: #ffffff;
+}
+
+body.light-theme .pin-preview {
+  border-color: #dcdedc;
+}
+
+body.light-theme .voice-fallback-input {
+  background: #ffffff;
+  border-color: #e2e5e2;
+  color: var(--ink);
+}
+
+body.light-theme .voice-fallback-input::placeholder {
+  color: #8b918b;
+}
+
+body.light-theme #calendarTitle {
+  color: var(--ink);
+}
+
+body.light-theme .weekday {
+  color: var(--ink-soft);
+}
+
+body.light-theme .day-cell {
+  background: #ffffff;
+  border-color: #e4e7e4;
+}
+
+body.light-theme .day-cell.is-empty {
+  background: #f7f9f7;
+}
+
+body.light-theme .day-cell.has-notes {
+  border-color: rgba(30, 169, 95, 0.5);
+  background: rgba(30, 169, 95, 0.14);
+}
+
+body.light-theme .day-number {
+  color: var(--ink);
+}
+
+body.light-theme .image-empty {
+  border-color: rgba(20, 23, 20, 0.2);
+}
+
+body.light-theme .bg-glow {
+  opacity: 0.4;
 }
 

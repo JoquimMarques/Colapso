@@ -1,6 +1,6 @@
-const STATIC_CACHE = "colapso-static-v3";
-const RUNTIME_CACHE = "colapso-runtime-v3";
-const FONT_CACHE = "colapso-fonts-v3";
+const STATIC_CACHE = "colapso-static-v5";
+const RUNTIME_CACHE = "colapso-runtime-v5";
+const FONT_CACHE = "colapso-fonts-v5";
 
 const APP_SHELL_FILES = [
   "./",
@@ -47,8 +47,10 @@ self.addEventListener("fetch", (event) => {
 async function networkFirst(request) {
   try {
     const response = await fetch(request);
-    const cache = await caches.open(RUNTIME_CACHE);
-    cache.put(request, response.clone());
+    if (shouldCacheResponse(request, response)) {
+      const cache = await caches.open(RUNTIME_CACHE);
+      cache.put(request, response.clone());
+    }
     return response;
   } catch {
     const cached = await caches.match(request);
@@ -59,6 +61,21 @@ async function networkFirst(request) {
 
     throw new Error("Offline and no cached shell available");
   }
+}
+
+// Nunca guardar no cache uma resposta que nao corresponde ao tipo de asset
+// pedido (ex.: o Vite em desenvolvimento devolve CSS embrulhado em JavaScript).
+function shouldCacheResponse(request, response) {
+  if (!response || !response.ok) return false;
+
+  const contentType = String(response.headers.get("content-type") || "").toLowerCase();
+  const path = new URL(request.url).pathname.toLowerCase();
+
+  if (path.endsWith(".css")) return contentType.includes("text/css");
+  if (path.endsWith(".js") || path.endsWith(".mjs")) return contentType.includes("javascript");
+  if (path.endsWith(".html") || path.endsWith(".htm")) return contentType.includes("text/html");
+
+  return true;
 }
 
 async function staleWhileRevalidate(request, cacheName) {

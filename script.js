@@ -1,5 +1,8 @@
+import "./style.css";
+
 const STORAGE_KEY = "notas-mobile-v1";
 const THEME_KEY = "notas-theme-v1";
+const USER_KEY = "colapso-user-v1";
 
 function readFirebaseConfig() {
   const singleVar = String(import.meta.env.VITE_FIREBASE || "").trim();
@@ -36,12 +39,17 @@ const firebaseConfig = readFirebaseConfig();
 const authLockScreenEl = document.getElementById("authLockScreen");
 const authLockHintEl = document.getElementById("authLockHint");
 const authStatusEl = document.getElementById("authStatus");
+const authLoadingEl = document.getElementById("authLoading");
+const authActionsEl = document.getElementById("authActions");
 const googleLoginBtnEl = document.getElementById("googleLoginBtn");
 const accountBtnEl = document.getElementById("accountBtn");
 const accountModalEl = document.getElementById("accountModal");
 const accountInfoEl = document.getElementById("accountInfo");
 const closeAccountBtnEl = document.getElementById("closeAccountBtn");
 const logoutBtnEl = document.getElementById("logoutBtn");
+const themeToggleBtnEl = document.getElementById("themeToggleBtn");
+const themeToggleLabelEl = document.getElementById("themeToggleLabel");
+const themeColorMetaEl = document.querySelector('meta[name="theme-color"]');
 
 const notesListEl = document.getElementById("notesList");
 const contentInputEl = document.getElementById("contentInput");
@@ -109,6 +117,8 @@ let pinBuffer = "";
 let pinSuccessCallback = null;
 let isRecording = false;
 let editorSelectionRange = null;
+let authResolved = false;
+let storageBlocked = false;
 
 // Firebase
 let firebaseApp = null;
@@ -125,7 +135,53 @@ init();
 function init() {
   registerPwaServiceWorker();
   initTheme();
+  warnIfStorageIsBlocked();
   initFirebase();
+  window.setTimeout(ensureAuthResolved, 7000);
+}
+
+function warnIfStorageIsBlocked() {
+  if (canUseLocalStorage()) return;
+
+  storageBlocked = true;
+  authLockHintEl.textContent = storageBlockedHint();
+}
+
+function storageBlockedHint() {
+  return "O navegador nao esta a guardar dados deste site (modo privado/anonimo ou cookies bloqueados). A sessao vai ser perdida ao fechar.";
+}
+
+function loginHint() {
+  return "Inicia sessao para continuares a usar o Colapso e guardares as tuas notas.";
+}
+
+function canUseLocalStorage() {
+  try {
+    const probe = "__colapso_probe__";
+    localStorage.setItem(probe, "1");
+    localStorage.removeItem(probe);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function showAuthActions() {
+  if (authLoadingEl) authLoadingEl.classList.add("hidden");
+  if (authActionsEl) authActionsEl.classList.remove("hidden");
+}
+
+function resolveAuthGate() {
+  if (authResolved) return;
+  authResolved = true;
+  showAuthActions();
+}
+
+function ensureAuthResolved() {
+  if (authResolved) return;
+  resolveAuthGate();
+  authLockHintEl.textContent =
+    "Nao foi possivel verificar a sessao. Desativa o bloqueador de conteudos para gstatic.com e tenta novamente.";
 }
 
 async function initFirebase() {
@@ -155,6 +211,7 @@ async function initFirebase() {
       authLockHintEl.textContent =
         "Configuracao Firebase em falta. Verifica a variavel de ambiente VITE_FIREBASE (JSON do firebaseConfig).";
     }
+    resolveAuthGate();
     return;
   }
 
@@ -162,6 +219,12 @@ async function initFirebase() {
     firebaseApp = window.firebase.initializeApp(firebaseConfig);
     firebaseAuth = window.firebase.auth(firebaseApp);
     firestore = window.firebase.firestore(firebaseApp);
+
+    // A sessao tem de ser restaurada antes de qualquer coisa que possa
+    // atrasar (persistencia offline do Firestore). E isto que faz o app
+    // arrancar ja dentro da conta em vez de voltar ao ecrã do Google.
+    bindAuth();
+    await completeRedirectSignIn();
 
     try {
       await firestore.enablePersistence({ synchronizeTabs: false });
@@ -178,11 +241,10 @@ async function initFirebase() {
     if (!navigator.onLine) {
       authLockHintEl.textContent = "Sem ligacao a internet. Inicia sessao para continuar.";
     }
-
-    bindAuth();
   } catch {
     setAuthStatus("Erro ao inicializar o Firebase.");
     authLockHintEl.textContent = "Erro ao inicializar o Firebase. Tenta novamente.";
+    resolveAuthGate();
   }
 }
 
@@ -192,9 +254,32 @@ function bindAuth() {
   });
 }
 
+async function completeRedirectSignIn() {
+  if (!firebaseAuth || typeof firebaseAuth.getRedirectResult !== "function") return;
+
+  try {
+    const result = await firebaseAuth.getRedirectResult();
+    if (result && result.user) {
+      setAuthStatus("");
+      authLockHintEl.textContent = storageBlocked ? storageBlockedHint() : loginHint();
+    }
+  } catch (error) {
+    const code = error?.code || "";
+    if (code === "auth/unauthorized-domain" || code === "auth/network-request-failed") {
+      authLockHintEl.textContent =
+        code === "auth/unauthorized-domain"
+          ? "Dominio nao autorizado no Firebase. Adiciona este dominio em Firebase > Authentication > Settings > Authorized domains."
+          : "Sem ligacao a internet. Verifica a rede e tenta novamente.";
+    }
+  }
+}
+
 async function handleAuthStateChange(user) {
+  resolveAuthGate();
+
   if (user) {
     currentUser = user;
+    cacheUser(user);
     notes = loadLocalBackup();
     firstSyncDone = false;
 
@@ -206,6 +291,7 @@ async function handleAuthStateChange(user) {
   }
 
   currentUser = null;
+  cacheUser(null);
   stopNotesSubscription();
   notes = [];
   selectedId = null;
@@ -214,7 +300,7 @@ async function handleAuthStateChange(user) {
   document.body.classList.add("app-locked");
   authLockScreenEl.classList.remove("hidden");
   authStatusEl.textContent = "";
-  authLockHintEl.textContent = "Inicia sessao para continuares a usar o Colapso e guardares as tuas notas.";
+  authLockHintEl.textContent = storageBlocked ? storageBlockedHint() : loginHint();
   render();
 }
 
@@ -318,10 +404,17 @@ function bindEvents() {
   });
 
   logoutBtnEl.addEventListener("click", () => {
-    firebaseAuth.signOut().catch(() => {
-      setAuthStatus("Erro ao terminar sessao.");
-    });
+    if (firebaseAuth) {
+      firebaseAuth.signOut().catch(() => {
+        setAuthStatus("Erro ao terminar sessao.");
+      });
+    }
+    cacheUser(null);
     closeAccountModal();
+  });
+
+  themeToggleBtnEl?.addEventListener("click", () => {
+    toggleTheme();
   });
 
   viewAddBtnEl.addEventListener("click", () => {
@@ -509,7 +602,21 @@ async function handleGoogleLogin() {
   } catch (error) {
     const code = error?.code || "";
 
-    if (code === "auth/popup-blocked" || code === "auth/popup-closed-by-user") {
+    // Em telemovel (Safari/Chrome mobile, webviews) o popup e frequentemente
+    // bloqueado. Nesse caso fazemos redirect, que guarda a sessao na mesma.
+    if (code === "auth/popup-blocked" || code === "auth/operation-not-supported-in-this-environment") {
+      setAuthStatus("A redirecionar para o Google...");
+      try {
+        await firebaseAuth.signInWithRedirect(googleProvider());
+        return;
+      } catch {
+        setAuthStatus("Nao foi possivel iniciar sessao. Tenta novamente.");
+        authLockHintEl.textContent = "O navegador bloqueou o login com o Google.";
+        return;
+      }
+    }
+
+    if (code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") {
       authLockHintEl.textContent = "Fechaste a janela de login. Tenta novamente.";
       setAuthStatus("");
       return;
@@ -539,13 +646,49 @@ function setAuthStatus(message) {
   }
 }
 
-function openAccountModal() {
-  if (!currentUser) return;
+function cacheUser(user) {
+  try {
+    if (!user) {
+      localStorage.removeItem(USER_KEY);
+      return;
+    }
 
-  const name = currentUser.displayName || currentUser.email || "Utilizador";
-  const email = currentUser.email || "";
+    localStorage.setItem(
+      USER_KEY,
+      JSON.stringify({
+        uid: user.uid,
+        name: user.displayName || "",
+        email: user.email || "",
+        photo: user.photoURL || "",
+        savedAt: Date.now(),
+      })
+    );
+  } catch {
+    // Storage may be unavailable.
+  }
+}
+
+function readCachedUser() {
+  try {
+    const raw = localStorage.getItem(USER_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === "object" ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+function openAccountModal() {
+  const cached = readCachedUser();
+  if (!currentUser && !cached) return;
+
+  const name =
+    currentUser?.displayName || currentUser?.email || cached?.name || cached?.email || "Utilizador";
+  const email = currentUser?.email || cached?.email || "";
   const photo =
-    currentUser.photoURL ||
+    currentUser?.photoURL ||
+    cached?.photo ||
     'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="64" height="64" rx="32" fill="%231ea95f"/><text x="32" y="40" font-size="28" fill="white" text-anchor="middle" font-family="sans-serif">' +
       (name.charAt(0) || "?") +
       "</text></svg>";
@@ -1610,13 +1753,45 @@ function renderCalendar() {
 }
 
 function initTheme() {
-  applyTheme("dark");
+  applyTheme(readTheme());
+}
+
+function readTheme() {
+  try {
+    return localStorage.getItem(THEME_KEY) === "light" ? "light" : "dark";
+  } catch {
+    return "dark";
+  }
 }
 
 function applyTheme(theme) {
-  const dark = theme === "dark" || !theme;
-  document.body.classList.add("dark-theme");
-  localStorage.setItem(THEME_KEY, "dark");
+  const next = theme === "light" ? "light" : "dark";
+  const light = next === "light";
+
+  document.body.classList.toggle("light-theme", light);
+  document.body.classList.toggle("dark-theme", !light);
+
+  try {
+    localStorage.setItem(THEME_KEY, next);
+  } catch {
+    // Storage may be unavailable.
+  }
+
+  if (themeColorMetaEl) {
+    themeColorMetaEl.setAttribute("content", light ? "#f4f6f4" : "#000000");
+  }
+
+  updateThemeToggleLabel();
+}
+
+function toggleTheme() {
+  applyTheme(document.body.classList.contains("light-theme") ? "dark" : "light");
+}
+
+function updateThemeToggleLabel() {
+  if (!themeToggleLabelEl) return;
+  const light = document.body.classList.contains("light-theme");
+  themeToggleLabelEl.textContent = light ? "Modo escuro" : "Modo claro";
 }
 
 function generateNoteTitle(content) {
@@ -1664,6 +1839,10 @@ function getNoteCountByDay(year, month) {
 
 function registerPwaServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
+
+  // Em desenvolvimento o SW mete no cache respostas do Vite (incluindo CSS
+  // embrulhado em JavaScript) e fica a servir conteudo velho. So registar em producao.
+  if (import.meta.env.DEV) return;
 
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("./sw.js").catch(() => {

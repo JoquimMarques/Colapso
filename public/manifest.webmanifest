@@ -1,6 +1,6 @@
 {
-  "name": "Colapso",
-  "short_name": "Colapso",
+  "name": "BrioNote",
+  "short_name": "BrioNote",
   "description": "Bloco de notas online com conta Google e Firestore.",
   "lang": "pt-PT",
   "start_url": "./index.html",

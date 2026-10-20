@@ -49,6 +49,7 @@ const closeAccountBtnEl = document.getElementById("closeAccountBtn");
 const logoutBtnEl = document.getElementById("logoutBtn");
 const themeToggleBtnEl = document.getElementById("themeToggleBtn");
 const themeToggleLabelEl = document.getElementById("themeToggleLabel");
+const themeQuickBtnEl = document.getElementById("themeQuickBtn");
 const themeColorMetaEl = document.querySelector('meta[name="theme-color"]');
 
 const notesListEl = document.getElementById("notesList");
@@ -152,7 +153,7 @@ function storageBlockedHint() {
 }
 
 function loginHint() {
-  return "Inicia sessao para continuares a usar o Colapso e guardares as tuas notas.";
+  return "Inicia sessao para continuares a usar o BrioNote e guardares as tuas notas.";
 }
 
 function canUseLocalStorage() {
@@ -230,11 +231,11 @@ async function initFirebase() {
       await firestore.enablePersistence({ synchronizeTabs: false });
     } catch (err) {
       if (err && err.code === "failed-precondition") {
-        console.warn("Colapso: multiplos separadores abertos — persistencia offline desativada neste separador.");
+        console.warn("BrioNote: multiplos separadores abertos — persistencia offline desativada neste separador.");
       } else if (err && err.code === "unimplemented") {
-        console.warn("Colapso: este browser nao suporta persistencia offline.");
+        console.warn("BrioNote: este browser nao suporta persistencia offline.");
       } else {
-        console.warn("Colapso: falha ao ativar persistencia offline.", err);
+        console.warn("BrioNote: falha ao ativar persistencia offline.", err);
       }
     }
 
@@ -414,6 +415,10 @@ function bindEvents() {
   });
 
   themeToggleBtnEl?.addEventListener("click", () => {
+    toggleTheme();
+  });
+
+  themeQuickBtnEl?.addEventListener("click", () => {
     toggleTheme();
   });
 

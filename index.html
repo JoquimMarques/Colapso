@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#000000">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="Colapso">
-  <title>Colapso</title>
+  <meta name="apple-mobile-web-app-title" content="BrioNote">
+  <title>BrioNote</title>
   <link rel="icon" type="image/x-icon" href="img/favicon (1)/favicon.ico">
   <link rel="icon" type="image/svg+xml" href="img/favicon (1)/favicon.svg">
   <link rel="icon" type="image/png" sizes="96x96" href="img/favicon (1)/favicon-96x96.png">
@@ -34,12 +34,12 @@
   <section id="authLockScreen" class="startup-lock" aria-label="Autenticacao">
     <div class="startup-card auth-card" role="dialog" aria-modal="true" aria-label="Iniciar sessao">
       <div class="startup-top">
-        <img class="startup-lock-logo" src="img/logoo.png" alt="Colapso">
-        <h2>Colapso</h2>
+        <img class="startup-lock-logo" src="img/logoo.jpg" alt="" style="border-radius:30px">
+        <h2 style="margin-top: 30px;">BrioNote</h2>
       </div>
 
       <div class="startup-bottom">
-        <p id="authLockHint" class="startup-hint">Inicia sessao para continuares a usar o Colapso e guardares as tuas notas.</p>
+        <p id="authLockHint" class="startup-hint">Inicia sessao para continuares a usar o BrioNote e guardares as tuas notas.</p>
 
         <div id="authLoading" class="auth-loading" role="status" aria-live="polite">
           <span class="auth-spinner" aria-hidden="true"></span>
@@ -70,6 +70,15 @@
     <section id="notesScreen" class="screen" aria-label="Tela de notas">
       <section class="search-wrap" aria-label="Pesquisa">
         <input id="searchInput" type="search" placeholder="Pesquisar..." autocomplete="off">
+        <button id="themeQuickBtn" class="search-theme-btn" type="button" aria-label="Mudar tema" title="Mudar tema">
+          <svg class="ico ico-sun ico-stroke" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>
+          </svg>
+          <svg class="ico ico-moon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.39 5.39 0 0 1-4.4 2.26 5.4 5.4 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"></path>
+          </svg>
+        </button>
       </section>
 
       <section class="content-grid">

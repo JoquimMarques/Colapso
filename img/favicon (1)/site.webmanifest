@@ -1,6 +1,6 @@
 {
-  "name": "Colapso",
-  "short_name": "Colapso",
+  "name": "Brionotas",
+  "short_name": "Brionotas",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",
@@ -15,7 +15,7 @@
       "purpose": "maskable"
     }
   ],
-  "theme_color": "#003009",
+  "theme_color": "#ffffff",
   "background_color": "#ffffff",
   "display": "standalone"
 }

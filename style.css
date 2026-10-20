@@ -1345,20 +1345,61 @@ body.is-add-view .content-editor {
   stroke-linejoin: round;
 }
 
-.theme-row-btn .ico-moon {
+.theme-row-btn .ico-moon,
+.search-theme-btn .ico-moon {
   display: none;
 }
 
-.theme-row-btn .ico-sun {
+.theme-row-btn .ico-sun,
+.search-theme-btn .ico-sun {
   display: block;
 }
 
-body.light-theme .theme-row-btn .ico-moon {
+body.light-theme .theme-row-btn .ico-moon,
+body.light-theme .search-theme-btn .ico-moon {
   display: block;
 }
 
-body.light-theme .theme-row-btn .ico-sun {
+body.light-theme .theme-row-btn .ico-sun,
+body.light-theme .search-theme-btn .ico-sun {
   display: none;
+}
+
+/* ===== Atalho de tema no ecra principal ===== */
+
+.search-wrap input {
+  padding-right: 54px;
+}
+
+.search-theme-btn {
+  position: absolute;
+  right: 7px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--bg-elev);
+  color: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.search-theme-btn .ico {
+  width: 19px;
+  height: 19px;
+}
+
+.search-theme-btn:active {
+  transform: translateY(-50%) scale(0.94);
+}
+
+body.light-theme .search-theme-btn {
+  background: #ffffff;
+  border-color: #e2e5e2;
 }
 
 .theme-row-btn {

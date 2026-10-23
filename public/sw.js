@@ -1,6 +1,6 @@
-const STATIC_CACHE = "colapso-static-v6";
-const RUNTIME_CACHE = "colapso-runtime-v6";
-const FONT_CACHE = "colapso-fonts-v6";
+const STATIC_CACHE = "colapso-static-v7";
+const RUNTIME_CACHE = "colapso-runtime-v7";
+const FONT_CACHE = "colapso-fonts-v7";
 
 const APP_SHELL_FILES = [
   "./",
